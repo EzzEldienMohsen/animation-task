@@ -1,0 +1,54 @@
+import React, { useState, useEffect } from 'react';
+import { useSpring, animated } from 'react-spring';
+import { motion } from 'framer-motion';
+import './styles.css'; // Import your Tailwind CSS file
+
+function App() {
+  const [scrollY, setScrollY] = useState(0);
+  const [isScrollingDown, setIsScrollingDown] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Check if scrolling down or up
+      setIsScrollingDown(currentScrollY > scrollY);
+      setScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [scrollY]);
+
+  // Define the spring animation
+  const springProps = useSpring({
+    translateY: isScrollingDown ? -50 : 0, // Adjust this value as needed
+  });
+
+  return (
+    <div className="container">
+      <motion.div
+        initial={{ opacity: 0, y: 50 }} // Initial animation for Framer Motion
+        animate={{ opacity: 1, y: 0 }} // Animation when in view
+        transition={{ duration: 0.5 }}
+      >
+        <animated.div
+          className="image-container"
+          style={{
+            transform: springProps.translateY.interpolate(
+              (val) => `translateY(${val}px)`
+            ),
+          }}
+        >
+          <img src="your-image-url.jpg" alt="Your Image" />
+        </animated.div>
+      </motion.div>
+      {/* Other content of your React app */}
+    </div>
+  );
+}
+
+export default App;
